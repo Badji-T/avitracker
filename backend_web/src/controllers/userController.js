@@ -1,0 +1,36 @@
+const User = require("../models/userModel");
+
+exports.getUsers = (req, res) => {
+  User.getAll((err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
+};
+
+exports.getUser = (req, res) => {
+  User.getById(req.params.id, (err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
+};
+
+exports.createUser = (req, res) => {
+  User.create(req.body, (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: "Utilisateur créé" });
+  });
+};
+
+exports.updateUser = (req, res) => {
+  User.update(req.params.id, req.body, (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: "Utilisateur modifié" });
+  });
+};
+
+exports.deleteUser = (req, res) => {
+  User.delete(req.params.id, (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: "Utilisateur supprimé" });
+  });
+};
