@@ -4,14 +4,25 @@ const morgan = require('morgan');
 
 const db = require('./db/database');
 const user = require('./routes/userRoutes');
+const lot = require('./routes/lotRoutes');
+const espece = require('./routes/especeRoutes');
+const depense = require('./routes/depenseRoutes');
+const perte = require('./routes/perteRoutes');
+const revenu = require('./routes/revenuRoutes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 app.use('/users', user); 
+app.use('/lots', lot);
+app.use('/especes', espece);
+app.use('/depenses', depense);
+app.use('/pertes', perte);
+app.use('/revenus', revenu);
 
 app.get('/', (req, res) => {
   res.send('API Avitracker OK');

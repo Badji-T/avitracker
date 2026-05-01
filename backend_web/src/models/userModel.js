@@ -19,9 +19,9 @@ const User = {
 
   create(data, callback) {
     db.query(
-      `INSERT INTO users (nom, tel, role, created_at, updated_at, deleted_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [data.nom, data.tel, data.role, new Date(), new Date(), null],
+      `INSERT INTO users (nom, tel, mot_de_passe, role, created_at, updated_at, deleted_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [data.nom, data.tel, data.mot_de_passe, data.role, new Date(), new Date(), null],
       callback
     );
   },
@@ -29,9 +29,9 @@ const User = {
   update(id, data, callback) {
     db.query(
       `UPDATE users
-       SET nom=?, tel=?, role=?, updated_at=?
+       SET nom=?, tel=?, mot_de_passe=?, role=?, updated_at=?
        WHERE id=?`,
-      [data.nom, data.tel, data.role, new Date(), id],
+      [data.nom, data.tel, data.mot_de_passe, data.role, new Date(), id],
       callback
     );
   },
