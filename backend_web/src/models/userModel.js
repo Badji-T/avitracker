@@ -1,4 +1,5 @@
 const db = require("../db/database");
+const bcrypt = require("bcrypt");
 
 const User = {
 
@@ -19,9 +20,9 @@ const User = {
 
   create(data, callback) {
     db.query(
-      `INSERT INTO users (nom, tel, mot_de_passe, role, created_at, updated_at, deleted_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [data.nom, data.tel, data.mot_de_passe, data.role, new Date(), new Date(), null],
+      `INSERT INTO users (nom, prenom, tel, mot_de_passe, role, created_at, updated_at, deleted_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.nom, data.prenom, data.tel, data.mot_de_passe, data.role, new Date(), new Date(), null],
       callback
     );
   },
