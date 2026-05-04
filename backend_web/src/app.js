@@ -10,6 +10,7 @@ const espece = require('./routes/especeRoutes');
 const depense = require('./routes/depenseRoutes');
 const perte = require('./routes/perteRoutes');
 const revenu = require('./routes/revenuRoutes');
+const auth = require('./routes/authRoutes');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/especes', espece);
 app.use('/depenses', depense);
 app.use('/pertes', perte);
 app.use('/revenus', revenu);
+app.use('/auth', auth);
 
 app.get('/', (req, res) => {
   res.send('API Avitracker OK');
