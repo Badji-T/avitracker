@@ -1,49 +1,80 @@
-const db = require("../db/database");
+module.exports = (sequelize, DataTypes) => {
+  const Lot = sequelize.define("Lot", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
 
-const lot = {
+    nom_lot: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
-  getAll(callback) {
-    db.query(
-      "SELECT * FROM lot WHERE deleted_at IS NULL",
-      callback
-    );
-  },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
 
-  getById(id, callback) {
-    db.query(
-      "SELECT * FROM lot WHERE id=? AND deleted_at IS NULL",
-      [id],
-      callback
-    );
-  },
+    espece_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
 
-  create(data, callback) {
-    db.query(
-      `INSERT INTO lot (nom_lot, user_id, espece_id, quantite_initiale, date_arrivee, created_at, updated_at, deleted_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.nom_lot, data.user_id, data.espece_id, data.quantite_initiale, data.date_arrivee, new Date(), new Date(), null],
-      callback
-    );
-  },
+    quantite_initiale: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
 
-  update(id, data, callback) {
-    db.query(
-      `UPDATE lot
-       SET nom_lot=?, user_id=?, espece_id=?, quantite_initiale=?, date_arrivee=?, updated_at=?
-       WHERE id=?`,
-      [data.nom_lot, data.user_id, data.espece_id, data.quantite_initiale, data.date_arrivee, new Date(), id],
-      callback
-    );
-  },
+    date_arrivee: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
 
-  delete(id, callback) {
-    db.query(
-      "UPDATE lot SET deleted_at=? WHERE id=?",
-      [new Date(), id],
-      callback
-    );
-  }
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
 
+  }, {
+    tableName: "lot",
+    timestamps: true,          // createdAt & updatedAt
+    paranoid: true,            // soft delete automatique
+    deletedAt: "deleted_at",
+    createdAt: "created_at",
+    updatedAt: "updated_at"
+  });
+
+  //Relations
+
+  Lot.associate = (models) => {
+
+    Lot.belongsTo(models.User, {
+      foreignKey: "user_id",
+      as: "user"
+    });
+
+    Lot.belongsTo(models.Espece, {
+      foreignKey: "espece_id",
+      as: "espece"
+    });
+
+    Lot.hasMany(models.Revenu, {
+      foreignKey: "lot_id",
+      as: "revenus"
+    });
+
+    Lot.hasMany(models.Depense, {
+      foreignKey: "lot_id",
+      as: "depenses"
+    });
+
+    Lot.hasMany(models.Perte, {
+      foreignKey: "lot_id",
+      as: "pertes"
+    });
+    
+  };
+
+  return Lot;
 };
-
-module.exports = lot;

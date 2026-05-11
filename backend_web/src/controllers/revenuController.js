@@ -1,36 +1,68 @@
-const Revenu = require("../models/revenuModel");
+const { Revenu } = require("../models");
 
-exports.getRevenus = (req, res) => {
-  Revenu.getAll((err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+exports.getRevenus = async (req, res) => {
+  try {
+    const revenu = await Revenu.findAll(req.params.id);
+    res.json(revenu);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
 };
 
-exports.getRevenu = (req, res) => {
-  Revenu.getById(req.params.id, (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+exports.getRevenu = async (req, res) => {
+  try {
+    const revenu = await Revenu.findByPk(req.params.id);
+    res.json(revenu);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
 };
 
-exports.createRevenu = (req, res) => {
-  Revenu.create(req.body, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Revenu créé" });
-  });
+exports.createRevenu = async (req, res) => {
+  try {
+    await Revenu.create({
+      lot_id: req.body.lot_id,
+      quantite_vendue: req.body.quantite_vendue,
+      montant_total: req.body.montant_total,
+      date_vente: req.body.date_vente
+    });
+
+    res.json({ message: "Revenu créé"});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
 };
 
-exports.updateRevenu = (req, res) => {
-  Revenu.update(req.params.id, req.body, (err, result) => {
-    if (err) return res.status(500).json(err);
+
+exports.updateRevenu = async (req, res) => {
+  try {
+    await Revenu.update(
+      {
+        lot_id: req.body.lot_id,
+        quantite_vendue: req.body.quantite_vendue,
+        montant_total: req.body.montant_total,
+        date_vente: req.body.date_vente
+      },
+      {
+        where: { id: req.params.id }
+      }
+    );
     res.json({ message: "Revenu modifié" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.deleteRevenu = (req, res) => {
-  Revenu.delete(req.params.id, (err, result) => {
-    if (err) return res.status(500).json(err);
+exports.deleteRevenu = async (req, res) => {
+  try {
+    await Revenu.destroy({
+      where: { id: req.params.id }
+    });
     res.json({ message: "Revenu supprimé" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };

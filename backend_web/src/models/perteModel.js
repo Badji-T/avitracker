@@ -1,49 +1,60 @@
-const db = require("../db/database");
+// src/models/perte.js
 
-const perte = {
+module.exports = (sequelize, DataTypes) => {
+  const Perte = sequelize.define("Perte", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
 
-  getAll(callback) {
-    db.query(
-      "SELECT * FROM perte WHERE deleted_at IS NULL",
-      callback
-    );
-  },
+    lot_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
 
-  getById(id, callback) {
-    db.query(
-      "SELECT * FROM perte WHERE id=? AND deleted_at IS NULL",
-      [id],
-      callback
-    );
-  },
+    quantite: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
 
-  create(data, callback) {
-    db.query(
-      `INSERT INTO perte (lot_id, quantite, montant, cause, date_perte, created_at, updated_at, deleted_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.lot_id, data.quantite, data.montant, data.cause, data.date_perte, new Date(), new Date(), null],
-      callback
-    );
-  },
+    montant: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
 
-  update(id, data, callback) {
-    db.query(
-      `UPDATE perte
-       SET lot_id=?, quantite=?, montant=?, cause=?, date_perte=?, updated_at=?
-       WHERE id=?`,
-      [data.lot_id, data.quantite, data.montant, data.cause, data.date_perte, new Date(), id],
-      callback
-    );
-  },
+    cause: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
-  delete(id, callback) {
-    db.query(
-      "UPDATE perte SET deleted_at=? WHERE id=?",
-      [new Date(), id],
-      callback
-    );
-  }
+    date_perte: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
 
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
+
+  }, {
+    tableName: "perte",
+    timestamps: true,          // createdAt & updatedAt
+    paranoid: true,            // soft delete automatique
+    deletedAt: "deleted_at",
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+  });
+
+  // Relations
+  Perte.associate = (models) => {
+    // une perte appartient à un lot
+    Perte.belongsTo(models.Lot, {
+      foreignKey: "lot_id",
+      as: "lot"
+    });
+  };
+
+  return Perte;
 };
-
-module.exports = perte;

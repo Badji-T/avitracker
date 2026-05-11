@@ -1,49 +1,55 @@
-const db = require("../db/database");
+// src/models/depense.js
 
-const depense = {
+module.exports = (sequelize, DataTypes) => {
+  const Depense = sequelize.define("Depense", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
 
-  getAll(callback) {
-    db.query(
-      "SELECT * FROM depense WHERE deleted_at IS NULL",
-      callback
-    );
-  },
+    lot_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
 
-  getById(id, callback) {
-    db.query(
-      "SELECT * FROM depense WHERE id=? AND deleted_at IS NULL",
-      [id],
-      callback
-    );
-  },
+    type_depense: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
-  create(data, callback) {
-    db.query(
-      `INSERT INTO depense (lot_id, type_depense, montant, date_depense, created_at, updated_at, deleted_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [data.lot_id, data.type_depense, data.montant, data.date_depense, new Date(), new Date(), null],
-      callback
-    );
-  },
+    montant: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
 
-  update(id, data, callback) {
-    db.query(
-      `UPDATE depense
-       SET lot_id=?, type_depense=?, montant=?, date_depense=?, updated_at=?
-       WHERE id=?`,
-      [data.lot_id, data.type_depense, data.montant, data.date_depense, new Date(), id],
-      callback
-    );
-  },
+    date_depense: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
 
-  delete(id, callback) {
-    db.query(
-      "UPDATE depense SET deleted_at=? WHERE id=?",
-      [new Date(), id],
-      callback
-    );
-  }
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
 
+  }, {
+    tableName: "depense",
+    timestamps: true,
+    paranoid: true,          // soft delete automatique
+    deletedAt: "deleted_at",
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+  });
+
+  // Relations
+  Depense.associate = (models) => {
+    // une dépense appartient à un lot
+    Depense.belongsTo(models.Lot, {
+      foreignKey: "lot_id",
+      as: "lot"
+    });
+  };
+
+  return Depense;
 };
-
-module.exports = depense;

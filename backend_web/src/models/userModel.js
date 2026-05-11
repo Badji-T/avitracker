@@ -1,50 +1,61 @@
-const db = require("../db/database");
+const { DataTypes } = require("sequelize");
+const db = require("../config/config");
 const bcrypt = require("bcrypt");
 
-const User = {
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define("User", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
 
-  getAll(callback) {
-    db.query(
-      "SELECT * FROM users WHERE deleted_at IS NULL",
-      callback
-    );
-  },
+    nom: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
-  getById(id, callback) {
-    db.query(
-      "SELECT * FROM users WHERE id=? AND deleted_at IS NULL",
-      [id],
-      callback
-    );
-  },
+    prenom: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
-  create(data, callback) {
-    db.query(
-      `INSERT INTO users (nom, prenom, tel, mot_de_passe, role, created_at, updated_at, deleted_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.nom, data.prenom, data.tel, data.mot_de_passe, data.role, new Date(), new Date(), null],
-      callback
-    );
-  },
+    tel: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
 
-  update(id, data, callback) {
-    db.query(
-      `UPDATE users
-       SET nom=?, tel=?, mot_de_passe=?, role=?, updated_at=?
-       WHERE id=?`,
-      [data.nom, data.tel, data.mot_de_passe, data.role, new Date(), id],
-      callback
-    );
-  },
+    mot_de_passe: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
-  delete(id, callback) {
-    db.query(
-      "UPDATE users SET deleted_at=? WHERE id=?",
-      [new Date(), id],
-      callback
-    );
-  }
+    role: {
+      type: DataTypes.STRING,
+      defaultValue: "user"
+    },
 
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
+
+  }, {
+    tableName: "users",
+    timestamps: true, // createdAt & updatedAt
+    paranoid: true,   // remplace deleted_at automatiquement
+    deletedAt: "deleted_at",
+    createdAt: "created_at",
+    updatedAt: "updated_at"
+  });
+
+  User.associate = (models) => {
+    User.hasMany(models.Lot, {
+      foreignKey: "user_id",
+      as: "lots"
+    });
 };
 
-module.exports = User;
+  return User;
+};

@@ -1,49 +1,54 @@
-const db = require("../db/database");
+// src/models/revenu.js
 
-const revenu = {
+module.exports = (sequelize, DataTypes) => {
+  const Revenu = sequelize.define("Revenu", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
 
-  getAll(callback) {
-    db.query(
-      "SELECT * FROM revenu WHERE deleted_at IS NULL",
-      callback
-    );
-  },
+    lot_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
 
-  getById(id, callback) {
-    db.query(
-      "SELECT * FROM revenu WHERE id=? AND deleted_at IS NULL",
-      [id],
-      callback
-    );
-  },
+    quantite_vendue: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
 
-  create(data, callback) {
-    db.query(
-      `INSERT INTO revenu (lot_id, quantite_vendue, montant_total, date_vente, created_at, updated_at, deleted_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [data.lot_id, data.quantite_vendue, data.montant_total, data.date_vente, new Date(), new Date(), null],
-      callback
-    );
-  },
+    montant_total: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
 
-  update(id, data, callback) {
-    db.query(
-      `UPDATE revenu
-       SET lot_id=?, quantite_vendue=?, montant_total=?, date_vente=?, updated_at=?
-       WHERE id=?`,
-      [data.lot_id, data.quantite_vendue, data.montant_total, data.date_vente, new Date(), id],
-      callback
-    );
-  },
+    date_vente: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
 
-  delete(id, callback) {
-    db.query(
-      "UPDATE revenu SET deleted_at=? WHERE id=?",
-      [new Date(), id],
-      callback
-    );
-  }
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
 
+  }, {
+    tableName: "revenu",
+    timestamps: true,          // createdAt & updatedAt
+    paranoid: true,            // remplace ton deleted_at manuel
+    deletedAt: "deleted_at",
+    createdAt: "created_at",
+    updatedAt: "updated_at",    // correspond à ta colonne existante
+  });
+
+  // 🔗 Relations (si tu as un model Lot)
+  Revenu.associate = (models) => {
+    Revenu.belongsTo(models.Lot, {
+      foreignKey: "lot_id",
+      as: "lot"
+    });
+  };
+
+  return Revenu;
 };
-
-module.exports = revenu;

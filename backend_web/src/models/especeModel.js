@@ -1,49 +1,46 @@
-const db = require("../db/database");
+// src/models/espece.js
 
-const espece = {
+module.exports = (sequelize, DataTypes) => {
+  const Espece = sequelize.define("Espece", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
 
-  getAll(callback) {
-    db.query(
-      "SELECT * FROM espece WHERE deleted_at IS NULL",
-      callback
-    );
-  },
+    nom_espece: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
-  getById(id, callback) {
-    db.query(
-      "SELECT * FROM espece WHERE id=? AND deleted_at IS NULL",
-      [id],
-      callback
-    );
-  },
+    Description: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
 
-  create(data, callback) {
-    db.query(
-      `INSERT INTO espece (nom_espece, Description, created_at, updated_at, deleted_at)
-       VALUES (?, ?, ?, ?, ?)`,
-      [data.nom_espece, data.Description, new Date(), new Date(), null],
-      callback
-    );
-  },
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
 
-  update(id, data, callback) {
-    db.query(
-      `UPDATE espece
-       SET nom_espece=?, Description=?, updated_at=?
-       WHERE id=?`,
-      [data.nom_espece, data.Description, new Date(), id],
-      callback
-    );
-  },
+  }, {
+    tableName: "espece",
+    timestamps: true,          // createdAt & updatedAt
+    paranoid: true,            // soft delete automatique
+    deletedAt: "deleted_at",
+    createdAt: "created_at",
+    updatedAt: "updated_at" 
+  });
 
-  delete(id, callback) {
-    db.query(
-      "UPDATE espece SET deleted_at=? WHERE id=?",
-      [new Date(), id],
-      callback
-    );
-  }
+  // Relations
+  Espece.associate = (models) => {
+    // une espèce possède plusieurs lots
+    Espece.hasMany(models.Lot, {
+      foreignKey: "espece_id",
+      as: "lots"
+    });
+  };
 
+
+  return Espece;
 };
-
-module.exports = espece;

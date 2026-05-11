@@ -1,47 +1,70 @@
-const User = require("../models/userModel");
+const { User } = require("../models");
 const bcrypt = require("bcrypt");
 
-exports.getUsers = (req, res) => {
-  User.getAll((err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.findAll();
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
 };
 
-exports.getUser = (req, res) => {
-  User.getById(req.params.id, (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.createUser = (req, res) => {
-  bcrypt.hash(req.body.mot_de_passe, 10, (err, hash) => {
-    if (err) return res.status(500).json(err);
+exports.createUser = async (req, res) => {
+  try {
+    const hashedPassword = await bcrypt.hash(req.body.mot_de_passe, 10);
 
-    const userData = {
-      ...req.body,
-      mot_de_passe: hash
-    };
-
-    User.create(userData, (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: "Utilisateur créé" });
+    const userData = await User.create({
+      nom: req.body.nom,
+      prenom: req.body.prenom,
+      tel: req.body.tel,
+      mot_de_passe: hashedPassword,
+      role: req.body.role
     });
 
-  });
+    res.json({ message: "Utilisateur créé"});
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.updateUser = (req, res) => {
-  User.update(req.params.id, req.body, (err, result) => {
-    if (err) return res.status(500).json(err);
+
+exports.updateUser = async (req, res) => {
+  try {
+    await User.update(
+      {
+        nom: req.body.nom,
+        tel: req.body.tel,
+        mot_de_passe: req.body.mot_de_passe,
+        role: req.body.role
+      },
+      {
+        where: { id: req.params.id }
+      }
+    );
     res.json({ message: "Utilisateur modifié" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.deleteUser = (req, res) => {
-  User.delete(req.params.id, (err, result) => {
-    if (err) return res.status(500).json(err);
+exports.deleteUser = async (req, res) => {
+  try {
+    await User.destroy({
+      where: { id: req.params.id }
+    });
     res.json({ message: "Utilisateur supprimé" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };

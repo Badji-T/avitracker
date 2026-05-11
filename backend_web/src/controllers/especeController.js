@@ -1,36 +1,63 @@
-const Espece = require("../models/especeModel");
+const {Espece} = require("../models");
 
-exports.getEspeces = (req, res) => {
-  Espece.getAll((err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+exports.getEspeces = async (req, res) => {
+  try {
+    const especes = await Espece.findAll();
+    res.json(especes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
 };
 
-exports.getEspece = (req, res) => {
-  Espece.getById(req.params.id, (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+exports.getEspece = async (req, res) => {
+  try {
+    const especes = await Espece.findByPk(req.params.id);
+    res.json(especes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
 };
 
-exports.createEspece = (req, res) => {
-  Espece.create(req.body, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Espèce créée" });
-  });
+exports.createEspece = async (req, res) => {
+  try {
+    await Espece.create({
+      nom_espece: req.body.nom_espece,
+      Description: req.body.Description
+    });
+
+    res.json({ message: "Espèce créée"});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
 };
 
-exports.updateEspece = (req, res) => {
-  Espece.update(req.params.id, req.body, (err, result) => {
-    if (err) return res.status(500).json(err);
+exports.updateEspece = async (req, res) => {
+  try {
+    await Espece.update(
+      {
+        nom_espece: req.body.nom_espece,
+        Description: req.body.Description
+      },
+      {
+        where: { id: req.params.id }
+      }
+    );
     res.json({ message: "Espèce modifiée" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.deleteEspece = (req, res) => {
-  Espece.delete(req.params.id, (err, result) => {
-    if (err) return res.status(500).json(err);
+exports.deleteEspece = async (req, res) => {
+  try {
+    await Espece.destroy({
+      where: { id: req.params.id }
+    });
     res.json({ message: "Espèce supprimée" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };

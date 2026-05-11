@@ -1,7 +1,6 @@
-const db = require('../db/database');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
-const User = require("../models/userModel");
+const { User } = require("../models");
 
 //SE CONNECTER
 exports.login = (req, res) => {
@@ -12,11 +11,8 @@ exports.login = (req, res) => {
   }
 
   // Verifier si le user existe
-  db.query("SELECT * FROM users WHERE tel = ?", [tel], (err, results) => {
-    if (err) return res.status(500).json(err);
-
-    // Si aucun utilisateur trouvé avec ce numéro de téléphone
-    if (results.length === 0) {
+  User.findOne({ where: { tel } }).then(user => {
+    if (!user) {
       return res.status(401).json({ message: "Numéro incorrect" });
     }
 
