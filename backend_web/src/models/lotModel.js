@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true
     },
 
-    nom_lot: {
+    code_lot: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -59,9 +59,14 @@ module.exports = (sequelize, DataTypes) => {
       as: "espece"
     });
 
-    Lot.hasMany(models.Revenu, {
+    Lot.belongsTo(models.Bloc, {
+      foreignKey: "bloc_id",
+      as: "bloc"
+    });
+
+    Lot.hasMany(models.Vente, {
       foreignKey: "lot_id",
-      as: "revenus"
+      as: "ventes"
     });
 
     Lot.hasMany(models.Depense, {

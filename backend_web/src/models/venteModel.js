@@ -1,7 +1,7 @@
-// src/models/revenu.js
-
 module.exports = (sequelize, DataTypes) => {
-  const Revenu = sequelize.define("Revenu", {
+
+  const Vente = sequelize.define("Vente", {
+
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -10,6 +10,11 @@ module.exports = (sequelize, DataTypes) => {
 
     lot_id: {
       type: DataTypes.INTEGER,
+      allowNull: false
+    },
+
+    prix_unitaire: {
+      type: DataTypes.FLOAT,
       allowNull: false
     },
 
@@ -34,21 +39,31 @@ module.exports = (sequelize, DataTypes) => {
     }
 
   }, {
-    tableName: "revenu",
-    timestamps: true,          // createdAt & updatedAt
-    paranoid: true,            // remplace ton deleted_at manuel
+
+    tableName: "vente",
+
+    timestamps: true,
+
+    paranoid: true,
+
     deletedAt: "deleted_at",
+
     createdAt: "created_at",
-    updatedAt: "updated_at",    // correspond à ta colonne existante
+
+    updatedAt: "updated_at"
+
   });
 
-  // 🔗 Relations (si tu as un model Lot)
-  Revenu.associate = (models) => {
-    Revenu.belongsTo(models.Lot, {
+  // Relations
+  Vente.associate = (models) => {
+
+    Vente.belongsTo(models.Lot, {
+
       foreignKey: "lot_id",
+
       as: "lot"
     });
   };
 
-  return Revenu;
+  return Vente;
 };

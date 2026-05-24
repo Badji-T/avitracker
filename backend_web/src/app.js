@@ -9,7 +9,8 @@ const lot = require('./routes/lotRoutes');
 const espece = require('./routes/especeRoutes');
 const depense = require('./routes/depenseRoutes');
 const perte = require('./routes/perteRoutes');
-const revenu = require('./routes/revenuRoutes');
+const vente = require('./routes/venteRoutes');
+const bloc = require('./routes/blocRoutes');
 const auth = require('./routes/authRoutes');
 
 const app = express();
@@ -24,7 +25,8 @@ app.use('/lots', lot);
 app.use('/especes', espece);
 app.use('/depenses', depense);
 app.use('/pertes', perte);
-app.use('/revenus', revenu);
+app.use('/ventes', vente);
+app.use('/blocs', bloc);
 app.use('/auth', auth);
 
 app.get('/', (req, res) => {

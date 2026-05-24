@@ -11,22 +11,22 @@ exports.login = (req, res) => {
   }
 
   // Verifier si le user existe
-  User.findOne({ where: { tel } }).then(user => {
+  User.findOne({ where: { tel }}).then(user => {
     if (!user) {
       return res.status(401).json({ message: "Numéro incorrect" });
     }
 
     // Si le user existe, verifier le mot de passe
-    const user = results[0];
+    const User = results[0];
 
-    bcrypt.compare(mot_de_passe, user.mot_de_passe, (err, isMatch) => {
+    bcrypt.compare(mot_de_passe, User.mot_de_passe, (err, isMatch) => {
       if (err) return res.status(500).json(err);
 
       if (!isMatch) {
         return res.status(401).json({ message: "Mot de passe incorrect" });
       }
 
-      // Generation de token JWT si elles sont valides.
+      // Generation de token JWT si elles sont valides. tokens cree vrifie dans authMiddleware.verifyToken().
       const token = jwt.sign(
         { id: user.id, role: user.role },
         process.env.JWT_SECRET,

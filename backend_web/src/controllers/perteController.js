@@ -1,4 +1,5 @@
 const {Perte} = require("../models");
+const perteService = require("../services/perteService");
 
 exports.getPertes = async (req, res) => {
   try {
@@ -22,15 +23,11 @@ exports.getPerte = async (req, res) => {
 
 exports.createPerte = async (req, res) => {
   try {
-    await Perte.create({
-      lot_id: req.body.lot_id,
-      quantite: req.body.quantite,
-      montant: req.body.montant,
-      cause: req.body.cause,
-      date_perte: req.body.date_perte
-    });
-
-    res.json({ message: "Perte créée"});
+    const perte = await perteService.createPerte(req.body);
+      res.status(201).json({
+        message: "Perte enregistrée",
+        perte
+      });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Erreur serveur", error: err.message });

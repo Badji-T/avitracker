@@ -9,5 +9,5 @@ app.listen(PORT, () => {
 });
 
 db.sequelize.sync()
-  .then(() => console.log("ORM Sequelize connected on Railway MySQL"))
+  .then(() => console.log("ORM Sequelize connected on PHP my admin MySQL"))
   .catch(err => console.log(err));
