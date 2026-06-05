@@ -1,0 +1,205 @@
+
+
+import trash from "../../../icons/trash.svg";
+import pencil from "../../../icons/pencil.svg";
+
+import Badge from "../../ui/badge/Badge";
+import DataTable from "react-data-table-component";
+import { useEffect, useState } from "react";
+import api from "../../../api/axios";
+//import axios from "axios";
+
+interface User {
+  id: number;
+  username: string;
+  nom: string;
+  prenom: string;
+  tel: string;
+  email: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+}
+// Columns
+const columns = [
+  {
+    name: "Username",
+    cell: (row: User) => (
+      <div className="flex items-center gap-3 py-3">
+        {/*<div className="w-10 h-10 overflow-hidden rounded-full">
+          <img
+            width={40}
+            height={40}
+            alt={row.nom}
+            className="object-cover w-full h-full"
+          />
+        </div>*/}
+
+        <div>
+          <span className="block font-medium text-gray-800 dark:text-white/90">
+            {row.username}
+          </span>
+
+          {/*<span className="block text-sm text-gray-500 dark:text-gray-400">
+            {row.nom} {row.prenom} - {row.role}
+          </span>*/}
+        </div>
+      </div>
+    ),
+    sortable: true,
+    grow: 2,
+  },
+
+  {
+    name: "Nom",
+    selector: (row: User) => row.nom,
+    sortable: true,
+  },
+
+  {
+    name: "Prenom",
+    selector: (row: User) => row.prenom,
+    sortable: true,
+  },
+
+  {
+    name: "Role",
+    cell: (row: User) => (
+      <Badge
+        size="sm"
+        color={
+          row.role === "admin"
+            ? "success"
+            : row.role === "user"
+            ? "warning"
+            : "error"
+        }
+      >
+        {row.role}
+      </Badge>
+    ),
+    sortable: true,
+  },
+
+  {
+    name: "Telephone",
+    selector: (row: User) => row.tel,
+    sortable: true,
+    grow: 3,
+  },
+
+  {
+    name: "Email(facultatif)",
+    selector: (row: User) => row.email ?? "N/A",
+    sortable: true,
+    grow: 3,
+  },
+
+
+  {
+    name: "Date_creation_compte",
+    selector: (row: User) => row.created_at.split("T")[0],
+    sortable: true,
+    grow: 3,
+  },
+
+  {
+    name: "Actions",
+    selector: (row: User) => row.created_at.split("T")[0],
+    sortable: true,
+    cell: (row: User) => (
+      <div className="flex items-center gap-4">
+        {/* Bouton Modifier */}
+      <button
+        onClick={() => console.log("Edit user:", row.id)} 
+        className="flex items-center justify-center w-9 h-9 rounded-lg border border-blue-200 text-blue-500 bg-orange-400 transition hover:bg-blue-50"
+      >
+        <img src={pencil} alt="Edit" className="w-5 h-5" />
+      </button>
+
+      {/* Bouton Supprimer */}
+      <button
+        onClick={() => console.log("Delete user:", row.id)} 
+        className="flex items-center justify-center w-9 h-9 rounded-lg border border-red-200 text-red-500 bg-red-400 transition hover:bg-red-50"
+      >
+        <img src={trash} alt="Trash" className="w-5 h-5" />
+      </button>
+      </div>
+    ),
+  },
+];
+
+// Component
+export default function BasicTableOne() {
+  // Recuperation des données depuis l'API
+  const [tableData, setTableData] = useState<User[]>([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await api.get("/users");
+
+        setTableData(response.data);
+
+        console.log(response.data);
+      } catch (error) {
+        console.error("Erreur chargement données :", error);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  return (
+    
+    <div className="w-full overflow-x-auto  rounded-2xl border border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <DataTable
+        columns={columns}
+        data={tableData}
+        pagination
+        highlightOnHover
+        responsive
+        striped
+        customStyles={{
+          table: {
+            style: {
+              backgroundColor: "transparent",
+            },
+          },
+
+          headRow: {
+            style: {
+              backgroundColor: "transparent",
+              borderBottomWidth: "1px",
+              borderBottomColor: "#E5E7EB",
+              minHeight: "56px",
+            },
+          },
+
+          headCells: {
+            style: {
+              fontSize: "13px",
+              fontWeight: "600",
+              color: "#6B7280",
+            },
+          },
+
+          rows: {
+            style: {
+              minHeight: "72px",
+              fontSize: "14px",
+              backgroundColor: "transparent",
+            },
+          },
+
+          pagination: {
+            style: {
+              borderTopWidth: "1px",
+              borderTopColor: "#E5E7EB",
+              minHeight: "56px",
+            },
+          },
+        }}
+      />
+    </div>
+  );
+}

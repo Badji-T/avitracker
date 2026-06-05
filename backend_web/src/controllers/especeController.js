@@ -1,4 +1,5 @@
 const {Espece} = require("../models");
+const especeService = require("../services/especeServices");
 
 exports.getEspeces = async (req, res) => {
   try {
@@ -22,8 +23,13 @@ exports.getEspece = async (req, res) => {
 
 exports.createEspece = async (req, res) => {
   try {
+    const code = await especeService.generateCodeEspece(
+        req.body.nom_espece
+      );
+
     await Espece.create({
       nom_espece: req.body.nom_espece,
+      code_espece: code,
       Description: req.body.Description
     });
 

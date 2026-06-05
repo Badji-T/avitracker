@@ -28,6 +28,7 @@ exports.createUser = async (req, res) => {
       nom: req.body.nom,
       prenom: req.body.prenom,
       tel: req.body.tel,
+      email: req.body.email,
       mot_de_passe: hashedPassword,
       role: req.body.role
     });
@@ -44,7 +45,9 @@ exports.updateUser = async (req, res) => {
     await User.update(
       {
         nom: req.body.nom,
+        prenom: req.body.prenom,
         tel: req.body.tel,
+        email: req.body.email,
         mot_de_passe: req.body.mot_de_passe,
         role: req.body.role
       },

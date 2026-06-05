@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+
+    nom_bloc: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     
     nombre_de_lot: {
       type: DataTypes.INTEGER,

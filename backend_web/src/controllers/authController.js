@@ -1,25 +1,26 @@
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const { User } = require("../models");
+const { Op } = require("sequelize");
 
 //SE CONNECTER
 exports.login = (req, res) => {
-  const { tel, mot_de_passe } = req.body;
-
-  if (!tel || !mot_de_passe) {
-    return res.status(400).json({ message: 'Numéro de téléphone et mot de passe requis.' });
+  const { identifier, password } = req.body;
+  if (!identifier || !password) {
+    return res.status(400).json({ message: 'Email/téléphone et mot de passe requis.' });
   }
-
-  // Verifier si le user existe
-  User.findOne({ where: { tel }}).then(user => {
-    if (!user) {
-      return res.status(401).json({ message: "Numéro incorrect" });
+  User.findOne({
+    where: {
+      [Op.or]: [
+        { email: identifier },
+        { tel: identifier }
+      ]
     }
-
-    // Si le user existe, verifier le mot de passe
-    const User = results[0];
-
-    bcrypt.compare(mot_de_passe, User.mot_de_passe, (err, isMatch) => {
+  }).then(user => {
+    if (!user) {
+      return res.status(401).json({ message: "Numéro ou Email incorrect" });
+    }
+    bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) return res.status(500).json(err);
 
       if (!isMatch) {
@@ -42,8 +43,11 @@ exports.login = (req, res) => {
         token,
         user: {
           id: user.id,
+          username: user.username,
           nom: user.nom,
           prenom: user.prenom,
+          tel: user.tel,
+          email: user.email,
           role: user.role
         }
       });
@@ -53,32 +57,58 @@ exports.login = (req, res) => {
 
 
 // S'INSCRIRE
-exports.register = (req, res) => {
-  const { tel, mot_de_passe } = req.body;
+exports.register = async (req, res) => {
 
-  if (!tel || !mot_de_passe) {
-    return res.status(400).json({ message: 'Numéro de téléphone et mot de passe requis.' });
-  }
+  try {
+    const {
+      nom,
+      prenom,
+      username,
+      tel,
+      email,
+      password
+    } = req.body;
 
-  db.query("SELECT * FROM users WHERE tel = ?", [tel], (err, results) => {
-    if (err) return res.status(500).json(err);
 
-    if (results.length > 0) {
-      return res.status(400).json({ message: "Ce numéro de téléphone est déjà utilisé." });
+    // Vérification champs obligatoires
+    if (!tel || !password) {
+      return res.status(400).json({ message: "Numéro de téléphone et mot de passe requis." });
     }
-  });
-  
-    bcrypt.hash(req.body.mot_de_passe, 10, (err, hash) => {
-    if (err) return res.status(500).json(err);
 
+
+    // Vérifier si utilisateur existe déjà
+    const existingUser = await User.findOne({ where: { tel } });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message:
+        "Ce numéro de téléphone est déjà utilisé."
+      });
+    }
+
+    // Hasher mot de passe
+    const hash = await bcrypt.hash(password, 10);
+
+    // Créer utilisateur
     const userData = {
-      ...req.body,
-      mot_de_passe: hash
+      nom,
+      prenom,
+      username,
+      tel,
+      email,
+      password: hash
     };
 
-    User.create(userData, (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: "Utilisateur créé" });
+    await User.create(userData);
+
+    res.status(201).json({ message: "Utilisateur créé" });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: err.message
     });
-  });
+  }
 };

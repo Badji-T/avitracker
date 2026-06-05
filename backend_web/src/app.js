@@ -20,14 +20,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-app.use('/users', user); 
-app.use('/lots', lot);
-app.use('/especes', espece);
-app.use('/depenses', depense);
-app.use('/pertes', perte);
-app.use('/ventes', vente);
-app.use('/blocs', bloc);
-app.use('/auth', auth);
+app.use('/api/users', user); 
+app.use('/api/lots', lot);
+app.use('/api/especes', espece);
+app.use('/api/depenses', depense);
+app.use('/api/pertes', perte);
+app.use('/api/ventes', vente);
+app.use('/api/blocs', bloc);
+app.use('/api/auth', auth);
 
 app.get('/', (req, res) => {
   res.send('API Avitracker OK');

@@ -1,4 +1,54 @@
-const { Lot, Depense, Perte, Vente } = require("../models");
+const { Lot, Depense, Perte, Vente, Espece } = require("../models");
+const { Op } = require("sequelize");
+
+//GENERATION DU CODE DU LOT
+const generateLotCode = async (especeId) => {
+
+    const espece =
+        await Espece.findByPk(especeId);
+
+    if (!espece) {
+        throw new Error("Espèce introuvable");
+    }
+
+    const codeEspece =
+        espece.code_espece.substring(0, 3);
+
+    const date =
+        new Date()
+        .toISOString()
+        .slice(0, 10)
+        .replace(/-/g, "");
+
+    const prefix =
+        `LOT-${codeEspece}-${date}`;
+
+    const lastLot =
+        await Lot.findOne({
+            where: {
+                code_lot: {
+                    [Op.like]:
+                    `${prefix}%`
+                }
+            },
+            order: [["code_lot", "DESC"]]
+        });
+
+    let nextNumber = 1;
+
+    if (lastLot) {
+
+        const lastPart =
+            lastLot.code_lot
+            .split("-")
+            .pop();
+
+        nextNumber =
+            parseInt(lastPart) + 1;
+    }
+
+    return `${prefix}-${String(nextNumber).padStart(3, "0")}`;
+};
 
 //COUT TOTAL
 const calculCoutTotal = async (lotId) => {
@@ -115,6 +165,7 @@ const getLotSummary = async (lotId) => {
 };
 
 module.exports = {
+    generateLotCode,
     calculCoutTotal,
     calculRevenuTotal,
     calculBenefice,

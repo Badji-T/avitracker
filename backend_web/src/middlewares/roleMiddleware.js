@@ -13,4 +13,18 @@ const authorizeRoles = (...roles) => {
     };
 };
 
+/*
+// Exemple d'utilisation dans une route
+
+const verifyToken = require("../middlewares/authMiddleware");
+const authorizeRoles = require("../middlewares/roleMiddleware");
+
+router.delete(
+    "/:id",
+    verifyToken,
+    authorizeRoles("admin"),
+    deleteAvion
+);
+*/
+
 module.exports = authorizeRoles;

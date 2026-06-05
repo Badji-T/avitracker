@@ -22,7 +22,11 @@ exports.getDepense = async (req, res) => {
 
 exports.createDepense = async (req, res) => {
   try {
+    const code = await depenseService.generateDepenseCode(
+        req.body.lot_id
+    );
     await Depense.create({
+      code: code,
       lot_id: req.body.lot_id,
       type_depense: req.body.type_depense,
       montant: req.body.montant,

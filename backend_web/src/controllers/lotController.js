@@ -26,7 +26,11 @@ const getLot = async (req, res) => {
 //Creer un lot
 const createLot = async (req, res) => {
   try {
+    const code_lot = await lotService.generateLotCode(
+        req.body.espece_id
+    );
     await Lot.create({
+      code_lot: code_lot,
       nom_lot: req.body.nom_lot,
       user_id: req.body.user_id,
       espece_id: req.body.espece_id,

@@ -8,6 +8,11 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true
     },
 
+    code_vente: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
     lot_id: {
       type: DataTypes.INTEGER,
       allowNull: false
@@ -31,6 +36,11 @@ module.exports = (sequelize, DataTypes) => {
     date_vente: {
       type: DataTypes.DATE,
       allowNull: false
+    },
+
+    nom_client: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
 
     deleted_at: {

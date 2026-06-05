@@ -8,6 +8,11 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true
     },
 
+    code_perte: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
     lot_id: {
       type: DataTypes.INTEGER,
       allowNull: false
