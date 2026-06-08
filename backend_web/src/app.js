@@ -12,6 +12,7 @@ const perte = require('./routes/perteRoutes');
 const vente = require('./routes/venteRoutes');
 const bloc = require('./routes/blocRoutes');
 const auth = require('./routes/authRoutes');
+const sync = require('./routes/syncRoutes');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/pertes', perte);
 app.use('/api/ventes', vente);
 app.use('/api/blocs', bloc);
 app.use('/api/auth', auth);
+app.use('/api/sync', sync);
 
 app.get('/', (req, res) => {
   res.send('API Avitracker OK');

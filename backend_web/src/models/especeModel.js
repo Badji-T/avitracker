@@ -3,9 +3,9 @@
 module.exports = (sequelize, DataTypes) => {
   const Espece = sequelize.define("Espece", {
     id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true
     },
 
     nom_espece: {

@@ -3,9 +3,9 @@
 module.exports = (sequelize, DataTypes) => {
   const Bloc = sequelize.define("Bloc", {
     id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true
     },
 
     nom_bloc: {

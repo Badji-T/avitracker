@@ -1,9 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
   const Lot = sequelize.define("Lot", {
     id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true
     },
 
     code_lot: {
@@ -12,12 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     },
 
     user_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false
     },
 
     espece_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false
     },
 
