@@ -3,9 +3,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.addColumn('users', 'username', {
+    await queryInterface.addColumn('users', 'firebase_uid', {
       type: Sequelize.STRING,
-      allowNull: true,
+      allowNull: false,
       unique: true,
       after: 'id'
     });
