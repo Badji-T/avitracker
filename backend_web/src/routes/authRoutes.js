@@ -1,19 +1,18 @@
-const express = require("express");
+// routes/authRoutes.js
+const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
+const authController = require('../controllers/authController');
 
-const authController = require("../controllers/authController");
-const verifyToken = require("../middlewares/authMiddleware");
-const authorizeRoles = require("../middlewares/roleMiddleware");
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 3,
+  keyGenerator: (req) => req.body.tel,
+  message: { error: 'Trop de tentatives, réessaie dans 10 minutes.' },
+});
 
-router.post("/login", authController.login);
-router.post("/register", authController.register);
-router.get(
-  "/admin-access",
-  verifyToken,
-  authorizeRoles("admin"),
-  (req, res) => {
-    res.status(200).json({ message: "Accès admin autorisé." });
-  }
-);
+router.post('/send-otp', otpLimiter, authController.sendOTP);
+router.post('/register/verify', authController.register);
+router.post('/login/verify', authController.login);
 
 module.exports = router;

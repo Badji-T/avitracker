@@ -1,114 +1,147 @@
-const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
-const { User } = require("../models");
-const { Op } = require("sequelize");
+// controllers/authController.js
+const { User } = require('../models');
+const { sendSmsOTP, verifySmsOTP } = require('../services/twilioService');
+const { sendEmailOTP, verifyEmailOTP } = require('../services/brevoService');
+const { formatPhone, isValidPhone } = require('../utils/formatPhone');
 
-//SE CONNECTER
-exports.login = (req, res) => {
-  const { identifier, password } = req.body;
-  if (!identifier || !password) {
-    return res.status(400).json({ message: 'Email/téléphone et mot de passe requis.' });
+// ─── HELPER INTERNE ───────────────────────────────────────────────────
+
+async function checkOTP(channel, tel, email, code) {
+  if (channel === 'email') {
+    return verifyEmailOTP(email, code);
   }
-  User.findOne({
-    where: {
-      [Op.or]: [
-        { email: identifier },
-        { tel: identifier }
-      ]
-    }
-  }).then(user => {
-    if (!user) {
-      return res.status(401).json({ message: "Numéro ou Email incorrect" });
-    }
-    bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) return res.status(500).json(err);
+  const status = await verifySmsOTP(tel, code);
+  return status === 'approved';
+}
 
-      if (!isMatch) {
-        return res.status(401).json({ message: "Mot de passe incorrect" });
-      }
+// ─── ENVOYER LE CODE OTP ──────────────────────────────────────────────
 
-      // Generation de token JWT si elles sont valides. tokens cree vrifie dans authMiddleware.verifyToken().
-      const token = jwt.sign(
-        { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
-        { 
-          algorithm: "HS256",
-          expiresIn: process.env.JWT_EXPIRES 
-        }
-      );
+exports.sendOTP = async (req, res) => {
+  const { tel, email, channel } = req.body;
 
-      // Retourner le token et les infos du user
-      res.json({
-        message: "Connexion réussie",
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-          nom: user.nom,
-          prenom: user.prenom,
-          tel: user.tel,
-          email: user.email,
-          role: user.role
-        }
-      });
-    })
-  });
-};
+  if (!tel) {
+    return res.status(400).json({ error: 'Numéro de téléphone requis.' });
+  }
 
-
-// S'INSCRIRE
-exports.register = async (req, res) => {
+  const formattedPhone = formatPhone(tel);
+  if (!isValidPhone(formattedPhone)) {
+    return res.status(400).json({ error: 'Numéro de téléphone invalide.' });
+  }
 
   try {
-    const {
-      nom,
-      prenom,
-      username,
-      tel,
-      email,
-      password
-    } = req.body;
-
-
-    // Vérification champs obligatoires
-    if (!tel || !password) {
-      return res.status(400).json({ message: "Numéro de téléphone et mot de passe requis." });
+    if (channel === 'email') {
+      if (!email) return res.status(400).json({ error: 'Email requis.' });
+      await sendEmailOTP(email);
+    } else {
+      await sendSmsOTP(formattedPhone);
     }
-
-
-    // Vérifier si utilisateur existe déjà
-    const existingUser = await User.findOne({ where: { tel } });
-
-    if (existingUser) {
-      return res.status(400).json({
-        message:
-        "Ce numéro de téléphone est déjà utilisé."
-      });
-    }
-
-    // Hasher mot de passe
-    const hash = await bcrypt.hash(password, 10);
-
-    // Créer utilisateur
-    const userData = {
-      nom,
-      prenom,
-      username,
-      tel,
-      email,
-      password: hash
-    };
-
-    await User.create(userData);
-
-    res.status(201).json({ message: "Utilisateur créé" });
-
+    res.json({ success: true, message: 'Code envoyé.' });
   } catch (err) {
-
-    console.error(err);
-
-    res.status(500).json({
-      message: err.message
-    });
+    console.error('sendOTP error:', err);
+    res.status(500).json({ error: "Erreur lors de l'envoi du code." });
   }
 };
+
+// ─── INSCRIPTION ──────────────────────────────────────────────────────
+
+exports.register = async (req, res) => {
+  const { tel, email, nom, prenom, username, code, channel } = req.body;
+
+  if (!tel || !code) {
+    return res.status(400).json({ error: 'Numéro et code OTP requis.' });
+  }
+
+  const formattedPhone = formatPhone(tel);
+  if (!isValidPhone(formattedPhone)) {
+    return res.status(400).json({ error: 'Numéro de téléphone invalide.' });
+  }
+
+  try {
+    // 1. Numéro déjà utilisé ?
+    const existing = await User.findOne({ where: { tel: formattedPhone } });
+    if (existing) {
+      return res.status(409).json({ error: 'Ce numéro est déjà associé à un compte.' });
+    }
+
+    // 2. Vérifier le code OTP
+    const approved = await checkOTP(channel, formattedPhone, email, code);
+    if (!approved) {
+      return res.status(400).json({ error: 'Code invalide ou expiré.' });
+    }
+
+    // 3. Créer le user seulement après vérification
+    const user = await User.create({
+      nom,
+      prenom,
+      username,
+      tel: formattedPhone,
+      email: email || null,
+      phoneVerified: true,
+    });
+
+    // 4. Générer le JWT
+    const token = generateJWT(user);
+    res.status(201).json({
+      message: 'Compte créé avec succès.',
+      token,
+      user: sanitizeUser(user),
+    });
+  } catch (err) {
+    console.error('register error:', err);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+};
+
+// ─── CONNEXION ────────────────────────────────────────────────────────
+
+exports.login = async (req, res) => {
+  const { tel, email, code, channel } = req.body;
+
+  if (!tel || !code) {
+    return res.status(400).json({ error: 'Numéro et code OTP requis.' });
+  }
+
+  const formattedPhone = formatPhone(tel);
+  if (!isValidPhone(formattedPhone)) {
+    return res.status(400).json({ error: 'Numéro de téléphone invalide.' });
+  }
+
+  try {
+    // 1. Vérifier le code OTP
+    const approved = await checkOTP(channel, formattedPhone, email, code);
+    if (!approved) {
+      return res.status(400).json({ error: 'Code invalide ou expiré.' });
+    }
+
+    // 2. Retrouver le user
+    const user = await User.findOne({ where: { tel: formattedPhone } });
+    if (!user) {
+      return res.status(404).json({ error: 'Aucun compte trouvé pour ce numéro.' });
+    }
+
+    // 3. Générer le JWT
+    const token = generateJWT(user);
+    res.json({
+      message: 'Connexion réussie.',
+      token,
+      user: sanitizeUser(user),
+    });
+  } catch (err) {
+    console.error('login error:', err);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+};
+
+// ─── HELPER : champs publics du user ─────────────────────────────────
+
+function sanitizeUser(user) {
+  return {
+    id: user.id,
+    nom: user.nom,
+    prenom: user.prenom,
+    username: user.username,
+    tel: user.tel,
+    email: user.email,
+    role: user.role,
+  };
+}
