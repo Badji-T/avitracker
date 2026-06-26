@@ -1,18 +1,52 @@
 // routes/authRoutes.js
-const express = require('express');
-const router = express.Router();
-const rateLimit = require('express-rate-limit');
-const authController = require('../controllers/authController');
 
+const express = require('express');
+const authController = require('../controllers/authController');
+const rateLimit = require('express-rate-limit');
+const verifyToken = require('../middlewares/authMiddleware');
+const verifyRoles = require('../middlewares/roleMiddleware');
+const { ipKeyGenerator } = require('express-rate-limit');
+
+const router = express.Router();
+
+// Limiteur OTP
 const otpLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
+  windowMs: 10 * 60 * 1000, // 10 minutes
   max: 3,
-  keyGenerator: (req) => req.body.tel,
-  message: { error: 'Trop de tentatives, réessaie dans 10 minutes.' },
+  keyGenerator: (req) => req.body.tel || ipKeyGenerator(req),
+  message: {
+    error: 'Trop de tentatives. Réessayez dans 10 minutes.'
+  }
 });
 
+// Limiteur connexion
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  keyGenerator: (req) => req.body.tel || ipKeyGenerator(req),
+  message: {
+    error: 'Trop de tentatives de connexion.'
+  }
+});
+
+//Recuperation des informations et envoi OTP (SMS ou Email)
+router.post('/startRegistration', otpLimiter, authController.startRegistration);
+
+// Verification OTP 
 router.post('/send-otp', otpLimiter, authController.sendOTP);
+
+// Inscription après vérification OTP
 router.post('/register/verify', authController.register);
-router.post('/login/verify', authController.login);
+
+// Connexion après vérification OTP
+router.post('/login/verify', loginLimiter, authController.login  );
+
+//Verification du role de l'utilisateur
+router.get('/verify-role', verifyToken, verifyRoles('admin'), (req, res) => {
+        res.status(200).json({
+            success: true,
+            user: req.user
+        });
+    });
 
 module.exports = router;

@@ -1,18 +1,17 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, replace, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
-import Checkbox from "../form/input/Checkbox";
-import { registerUser } from "../../services/authService";
+import { startRegistration } from "../../services/authService";
 import { AxiosError } from "axios";
 import Alert from "../ui/alert/Alert";
 import ComponentCard from "../common/ComponentCard";
+import Radio from "../form/input/Radio";
 
 export default function SignUpForm() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -23,7 +22,8 @@ export default function SignUpForm() {
     username: "",
     tel: "",
     email: "",
-    password: ""
+    password: "",
+    channel: "sms"
   });
 
   // Gérer les changements des inputs
@@ -37,29 +37,38 @@ export default function SignUpForm() {
     });
   };
 
+  // Gérer les changements des boutons radio
+  const handleRadioChange = (value: string) => {
+    console.log(value);
+
+    setFormData((prev) => ({
+      ...prev,
+      channel: value
+    }));
+  };
+
 
   // Soumission du formulaire
   const handleSubmit = async (
     e: React.FormEvent
   ) => {
-
     e.preventDefault();
 
     try {
-
-      const data =
-        await registerUser(formData);
-
+      const data = await startRegistration(formData);
       console.log(data);
-      setSuccessMessage("Compte créé avec succès ! Vous pouvez maintenant vous connecter.");
+
+      localStorage.setItem("pendingRegistration", JSON.stringify(formData));
+
+      setSuccessMessage( "Code de vérification envoyé avec succès." );
+
       setTimeout(() => {
-        navigate("/signin");
-      }, 3000);
+        navigate("/verify-otp", { replace: true });
+      }, 1500);
 
     } catch (error) {
 
       if (error instanceof AxiosError) {
-
         console.log(error.response?.data);
         setErrorMessage( error.response?.data?.message);
 
@@ -257,23 +266,38 @@ export default function SignUpForm() {
                     </div>
                   </div>
                 </div>
-                {/* <!-- Checkbox --> */}
-                <div className="flex items-center gap-3">
-                  <Checkbox
-                    className="w-5 h-5"
-                    checked={isChecked}
-                    onChange={setIsChecked}
-                  />
-                  <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
-                    By creating an account means you agree to the{" "}
-                    <span className="text-gray-800 dark:text-white/90">
-                      Terms and Conditions,
-                    </span>{" "}
-                    and our{" "}
-                    <span className="text-gray-800 dark:text-white">
-                      Privacy Policy
-                    </span>
-                  </p>
+                {/* <!-- Radio Buttons channel --> */}
+                <div className="space-y-3">
+                  <Label>
+                    Recevoir le code de vérification via 
+                    <span className="text-error-500">*</span>
+                  </Label>
+
+                  <div className="flex flex-wrap items-center gap-8">
+                    <Radio
+                      id="channel-email"
+                      name="channel"
+                      value="email"
+                      checked={formData.channel === "email"}
+                      onChange={handleRadioChange}
+                      label="Email"
+                    />
+
+                    <Radio
+                      id="channel-sms"
+                      name="channel"
+                      value="sms"
+                      checked={formData.channel === "sms"}
+                      onChange={handleRadioChange}
+                      label="SMS"
+                    />
+                  </div>
+
+                  {!formData.email && (
+                    <p className="text-xs text-gray-500">
+                      Ajoutez une adresse email pour recevoir le code par email.
+                    </p>
+                  )}
                 </div>
                 {/* <!-- Button --> */}
                 <div>

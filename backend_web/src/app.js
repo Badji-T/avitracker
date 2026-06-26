@@ -31,15 +31,4 @@ app.use('/api/blocs', bloc);
 app.use('/api/auth', auth);
 app.use('/api/sync', sync);
 
-app.get('/', (req, res) => {
-  res.send('API Avitracker OK');
-});
-
-app.get('/db', (req, res) => {
-  db.query("SELECT 1", (err, result) => {
-    if (err) return res.send(err);
-    res.send("API + DB OK ");
-  });
-});
-
 module.exports = app;

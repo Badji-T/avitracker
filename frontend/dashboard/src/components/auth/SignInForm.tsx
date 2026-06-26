@@ -41,16 +41,15 @@ export default function SignInForm() {
     try {
 
       const data = await loginUser(formData);
-      const token = data?.token;
 
-      if (!token) {
+      if (!data?.token) {
         setSuccessMessage("");
         setErrorMessage("Token manquant. Veuillez vous reconnecter.");
         return;
       }
 
       // Stocker le token puis demander au backend de valider le rôle admin
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data?.user ?? {}));
 
       try {
@@ -74,7 +73,7 @@ export default function SignInForm() {
       if (error instanceof AxiosError) {
 
         console.log(error.response?.data);
-        setErrorMessage( error.response?.data?.message);
+        setErrorMessage(error.response?.data?.error || error.response?.data?.message || "Une erreur est survenue.");
 
       } else {
 

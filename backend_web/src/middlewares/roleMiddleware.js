@@ -1,4 +1,4 @@
-const authorizeRoles = (...roles) => {
+const verifyRoles = (...roles) => {
 
     return (req, res, next) => {
 
@@ -27,4 +27,4 @@ router.delete(
 );
 */
 
-module.exports = authorizeRoles;
+module.exports = verifyRoles;

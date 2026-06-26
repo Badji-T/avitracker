@@ -1,8 +1,8 @@
 import PageMeta from "../../components/common/PageMeta";
 import AuthLayout from "./AuthPageLayout";
-import SignInForm from "../../components/auth/SignInForm";
+import OtpForm from "../../components/auth/OtpForm";
 
-export default function SignIn() {
+export default function SignUp() {
   return (
     <>
       <PageMeta
@@ -10,7 +10,7 @@ export default function SignIn() {
         description="This is an app for farmers"
       />
       <AuthLayout>
-        <SignInForm />
+        <OtpForm />
       </AuthLayout>
     </>
   );
