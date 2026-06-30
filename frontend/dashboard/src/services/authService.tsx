@@ -41,6 +41,9 @@ export const verifyAdminAccess = async () => {
 
 //DECONNEXION
 export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 };

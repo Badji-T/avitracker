@@ -41,6 +41,7 @@ export default function SignInForm() {
     try {
 
       const data = await loginUser(formData);
+      console.log(data);
 
       if (!data?.token) {
         setSuccessMessage("");
@@ -49,8 +50,10 @@ export default function SignInForm() {
       }
 
       // Stocker le token puis demander au backend de valider le rôle admin
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data?.user ?? {}));
+      const storage = isChecked ? localStorage : sessionStorage;
+
+      storage.setItem("token", data.token);
+      storage.setItem("user", JSON.stringify(data.user));
 
       try {
         await verifyAdminAccess();
@@ -60,8 +63,8 @@ export default function SignInForm() {
           navigate("/");
         }, 500);
       } catch (adminCheckError) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        storage.removeItem("token");
+        storage.removeItem("user");
         setSuccessMessage("");
         setErrorMessage("Accès refusé: ce compte n'a pas les permissions admin.");
       }

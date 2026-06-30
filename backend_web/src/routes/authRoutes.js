@@ -49,4 +49,6 @@ router.get('/verify-role', verifyToken, verifyRoles('admin'), (req, res) => {
         });
     });
 
+
+//verification du token pour les routes protégées
 module.exports = router;

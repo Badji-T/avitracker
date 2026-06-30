@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
+const { User } = require("../models");
 
-//VERIFIE SI TOKEN VALIDE
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
 
     const authHeader = req.headers.authorization;
 
@@ -13,18 +13,33 @@ const verifyToken = (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    try {
 
-        if (err) {
-            return res.status(403).json({
-                message: "Token invalide."
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const user = await User.findByPk(decoded.id);
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Utilisateur introuvable."
             });
         }
 
-        req.user = decoded;
+        req.user = {
+            id: user.id,
+            role: user.role
+        };
 
         next();
-    });
+
+    } catch (err) {
+
+        return res.status(403).json({
+            message: "Token invalide."
+        });
+
+    }
+
 };
 
 module.exports = verifyToken;
