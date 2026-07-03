@@ -67,10 +67,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "user_id",
       as: "lots"
     });
-    User.hasMany(models.PasswordReset, {
-        foreignKey: "userId",
-        as: "passwordResets"
-    });
 };
 
   return User;

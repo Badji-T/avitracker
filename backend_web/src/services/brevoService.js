@@ -61,27 +61,33 @@ exports.verifyEmailOTP = (email, code) => {
   return true;
 };
 
+/* Envoi d'un email de réinitialisation de mot de passe
+// Fonction générique d'envoi d'email
+const sendBrevoEmail = async ({ to, subject, text, htmlContent }) => {
+  return transporter.sendMail({
+    from: `"${process.env.BREVO_FROM_NAME}" <${process.env.BREVO_FROM_EMAIL}>`,
+    to,
+    subject,
+    text,
+    html: htmlContent,
+  });
+};
+
 // Envoi d'un email de réinitialisation de mot de passe
 exports.sendResetEmail = async (email, token) => {
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-
-    await sendBrevoEmail({
-        to: email,
-        subject: "Réinitialisation de votre mot de passe",
-        htmlContent: `
-            <h2>Réinitialisation du mot de passe</h2>
-
-            <p>Vous avez demandé une réinitialisation.</p>
-
-            <a href="${resetLink}">
-                Réinitialiser mon mot de passe
-            </a>
-
-            <p>Ce lien expire dans 1 heure.</p>
-        `
-    });
-
-}
+  return sendBrevoEmail({
+    to: email,
+    subject: "Réinitialisation de votre mot de passe",
+    text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${resetLink}`,
+    htmlContent: `
+      <h2>Réinitialisation de votre mot de passe</h2>
+      <p>Vous avez demandé une réinitialisation de votre mot de passe.</p>
+      <a href="${resetLink}">Réinitialiser mon mot de passe</a>
+      <p>Ce lien expire dans 1 heure.</p>
+    `,
+  });
+};*/
 
 exports.transporter = transporter;

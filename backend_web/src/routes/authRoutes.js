@@ -5,6 +5,7 @@ const authController = require('../controllers/authController');
 const rateLimit = require('express-rate-limit');
 const verifyToken = require('../middlewares/authMiddleware');
 const verifyRoles = require('../middlewares/roleMiddleware');
+const {forgotPassword, verifyResetOTP, resetPassword} = require("../controllers/pwdController");
 const { ipKeyGenerator } = require('express-rate-limit');
 
 const router = express.Router();
@@ -49,6 +50,10 @@ router.get('/verify-role', verifyToken, verifyRoles('admin'), (req, res) => {
         });
     });
 
+router.post("/forgot-password", otpLimiter, forgotPassword);
 
-//verification du token pour les routes protégées
+router.post("/verify-reset-otp", verifyResetOTP);
+
+router.post("/reset-password", resetPassword);
+
 module.exports = router;
