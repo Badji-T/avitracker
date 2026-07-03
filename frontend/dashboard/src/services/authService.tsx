@@ -39,6 +39,31 @@ export const verifyAdminAccess = async () => {
   return response.data;
 };
 
+//FORGOT PASSWORD
+export const forgotPassword = async (data: any) => {
+  const response = await api.post(
+    "/auth/forgot-password",
+    data
+  );
+  return response.data;
+};
+
+export const verifyResetOTP = async (data: any) => {
+  const response = await api.post(
+    "/auth/verify-reset-otp",
+    data
+  );
+  return response.data;
+};
+
+export const resetPassword = async (data: any) => {
+  const response = await api.post(
+    "/auth/reset-password",
+    data
+  );
+  return response.data;
+};
+
 //DECONNEXION
 export const logout = () => {
     localStorage.removeItem("token");
