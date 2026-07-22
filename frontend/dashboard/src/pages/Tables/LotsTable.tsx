@@ -25,7 +25,7 @@ export default function UsersTable() {
         description="This is React.js Users Tables Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
       />
       <div className="space-y-6">
-        <ComponentCard title="Liste des u">
+        <ComponentCard title="Liste des utilisateurs">
           <BasicTableUser />
         </ComponentCard>
       </div>

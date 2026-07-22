@@ -3,18 +3,10 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.addColumn('users', 'username', {
-      type: Sequelize.STRING,
+    await queryInterface.addColumn("users", "last_login", {
+      type: Sequelize.DATE,
       allowNull: true,
-      unique: true,
-      after: 'id'
     });
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
   },
 
   async down (queryInterface, Sequelize) {

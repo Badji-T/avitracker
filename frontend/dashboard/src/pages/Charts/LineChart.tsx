@@ -1,20 +1,17 @@
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import ComponentCard from "../../components/common/ComponentCard";
-import LineChartOne from "../../components/charts/line/LineChartOne";
+import StatisticsChart from "../../components/ecommerce/StatisticsChart";
 import PageMeta from "../../components/common/PageMeta";
 
 export default function LineChart() {
   return (
     <>
       <PageMeta
-        title="React.js Chart Dashboard | TailAdmin - React.js Admin Dashboard Template"
-        description="This is React.js Chart Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
+        title="Connexions des utilisateurs | Avitracker"
+        description="cette page affiche un graphique linéaire représentant la fréquence de connexion des utilisateurs sur la plateforme Avitracker."
       />
-      <PageBreadcrumb pageTitle="Line Chart" />
+      <PageBreadcrumb pageTitle="Statistiques d'évolution" />
       <div className="space-y-6">
-        <ComponentCard title="Line Chart 1">
-          <LineChartOne />
-        </ComponentCard>
+          <StatisticsChart />
       </div>
     </>
   );

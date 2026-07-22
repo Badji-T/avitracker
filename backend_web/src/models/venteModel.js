@@ -33,6 +33,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
 
+    cout_sujets_vendus: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0
+    },
+
+    benefice: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0
+    },
+
     date_vente: {
       type: DataTypes.DATE,
       allowNull: false

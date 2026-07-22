@@ -5,18 +5,28 @@ const generateDepenseCode =
 async (lotId) => {
 
     const lot =
-        await Lot.findByPk(lotId,{
-            include: Espece
+        await Lot.findByPk(lotId, {
+            include: [
+                {
+                    model: Espece,
+                    as: "espece"
+                }
+            ]
         });
 
+    if (!lot) {
+        throw new Error("Lot introuvable");
+    }
+
     const codeEspece =
-        lot.Espece.code.substring(0,3);
+        lot.espece.code_espece.substring(0, 3);
+
+    const now = new Date();
 
     const date =
-        new Date()
-        .toISOString()
-        .slice(0,10)
-        .replace(/-/g,"");
+        `${String(now.getDate()).padStart(2, "0")}` +
+        `${String(now.getMonth() + 1).padStart(2, "0")}` +
+        `${now.getFullYear()}`;
 
     const prefix =
         `DEP-${codeEspece}-${date}`;
@@ -24,13 +34,13 @@ async (lotId) => {
     const lastDepense =
         await Depense.findOne({
             where:{
-                code:{
+                code_depense:{
                     [Op.like]:
                     `${prefix}%`
                 }
             },
             order:[
-                ["code","DESC"]
+                ["code_depense","DESC"]
             ]
         });
 
@@ -40,7 +50,7 @@ async (lotId) => {
 
         nextNumber =
             parseInt(
-                lastDepense.code
+                lastDepense.code_depense
                 .split("-")
                 .pop()
             ) + 1;

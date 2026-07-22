@@ -1,51 +1,70 @@
 // src/models/espece.js
 
 module.exports = (sequelize, DataTypes) => {
-  const Espece = sequelize.define("Espece", {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
-    },
+  const Espece = sequelize.define(
+    "Espece",
+    {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+      },
 
-    nom_espece: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
+      // Propriétaire de l'espèce
+      user_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
 
-    code_espece: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
+      nom_espece: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
 
-    Description: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
+      code_espece: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
 
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true
+      Description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      deleted_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+    },
+    {
+      tableName: "espece",
+      timestamps: true,
+      paranoid: true,
+      deletedAt: "deleted_at",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
     }
-
-  }, {
-    tableName: "espece",
-    timestamps: true,          // createdAt & updatedAt
-    paranoid: true,            // soft delete automatique
-    deletedAt: "deleted_at",
-    createdAt: "created_at",
-    updatedAt: "updated_at" 
-  });
+  );
 
   // Relations
   Espece.associate = (models) => {
-    // une espèce possède plusieurs lots
+    // Une espèce appartient à un utilisateur
+    Espece.belongsTo(models.User, {
+      foreignKey: "user_id",
+      as: "user",
+    });
+
+    // Une espèce possède plusieurs lots
     Espece.hasMany(models.Lot, {
       foreignKey: "espece_id",
-      as: "lots"
+      as: "lots",
     });
   };
-
 
   return Espece;
 };

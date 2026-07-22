@@ -14,11 +14,12 @@ const generateLotCode = async (especeId) => {
     const codeEspece =
         espece.code_espece.substring(0, 3);
 
+    const now = new Date();
+
     const date =
-        new Date()
-        .toISOString()
-        .slice(0, 10)
-        .replace(/-/g, "");
+        `${String(now.getDate()).padStart(2, "0")}` +
+        `${String(now.getMonth() + 1).padStart(2, "0")}` +
+        `${now.getFullYear()}`;
 
     const prefix =
         `LOT-${codeEspece}-${date}`;
@@ -63,7 +64,13 @@ const calculCoutTotal = async (lotId) => {
         where: { lot_id: lotId }
     });
 
-    return (totalDepenses || 0) + (totalPertes || 0);
+    const lot = await Lot.findByPk(lotId);
+
+    if (!lot) {
+        throw new Error("Lot introuvable");
+    }
+
+    return Number(lot.cout_achat_initial || 0) + (totalDepenses || 0) + (totalPertes || 0);
 };
 
 //REVENU TOTAL
@@ -115,13 +122,33 @@ const calculCoutMoyenVolaille = async (lotId) => {
     // Cout total du lot
     const coutTotal = await calculCoutTotal(lotId);
 
-     // Quantite initiale
-    const quantiteInitiale = lot.quantite_initiale;
+    const quantiteRestante = await calculQuantiteRestante(lotId);
 
-    // Cout moyen par volaille
-    const coutMoyen = coutTotal / quantiteInitiale;
+    if (quantiteRestante <= 0) {
+        return 0;
+    }
+
+    const coutMoyen = coutTotal / quantiteRestante;
 
     return coutMoyen;
+};
+
+const calculTauxMortalite = async (lotId) => {
+    const lot = await Lot.findByPk(lotId);
+
+    if (!lot) {
+        throw new Error("Lot introuvable");
+    }
+
+    const totalLost = await Perte.sum("quantite", {
+        where: { lot_id: lotId }
+    });
+
+    if (!lot.quantite_initiale) {
+        return 0;
+    }
+
+    return ((totalLost || 0) / lot.quantite_initiale) * 100;
 };
 
 
@@ -154,13 +181,15 @@ const getLotSummary = async (lotId) => {
     const remainingQuantity = await calculQuantiteRestante(lotId);
 
     const coutMoyen = await calculCoutMoyenVolaille(lotId);
+    const tauxMortalite = await calculTauxMortalite(lotId);
 
     return {
         cout_total: totalCost,
         revenu_total: totalRevenue,
         cout_moyen_par_volaille: coutMoyen,
         benefice: profit,
-        quantite_restante: remainingQuantity
+        quantite_restante: remainingQuantity,
+        taux_mortalite: tauxMortalite
     };
 };
 
@@ -171,5 +200,6 @@ module.exports = {
     calculBenefice,
     calculQuantiteRestante,
     calculCoutMoyenVolaille,
+    calculTauxMortalite,
     getLotSummary
 };

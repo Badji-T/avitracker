@@ -36,7 +36,7 @@ const generateCodeEspece = async (nomEspece) => {
 
     if (lastEspece) {
 
-        const lastCode = lastEspece.code;
+        const lastCode = lastEspece.code_espece;
 
         const numericPart =
             parseInt(lastCode.slice(prefix.length));

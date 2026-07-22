@@ -1,5 +1,5 @@
-import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
+import Chart from "react-apexcharts";
 
 export default function LineChartOne() {
   const options: ApexOptions = {

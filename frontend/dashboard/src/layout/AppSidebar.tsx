@@ -28,16 +28,20 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
-    name: "Home",
+    name: "Dashboard",
     path: "/",
-    //subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
+    icon: <TableIcon />,
+    name: "Utilisateurs",
+    path: "/users-table",
+  },
+  /*{
     name: "Listes",
     icon: <TableIcon />,
     subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }, { name: "Utilisateurs", path: "/users-table", pro: false }],
   },
-  {
+  /*{
     icon: <CalenderIcon />,
     name: "Calendar",
     path: "/calendar",
@@ -46,26 +50,34 @@ const navItems: NavItem[] = [
     name: "Forms",
     icon: <ListIcon />,
     subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
-  },
-  {
+  },*/
+  /*{
     name: "Pages",
     icon: <PageIcon />,
     subItems: [
       { name: "Blank Page", path: "/blank", pro: false },
       { name: "404 Error", path: "/error-404", pro: false },
     ],
-  },
+  },*/
   {
+    icon: <PieChartIcon />,
+    name: "Statistiques",
+    subItems: [
+      { name: "Stats d'évolution", path: "/line-chart", pro: false },
+      { name: "Stats d'inscriptions", path: "/bar-chart", pro: false },
+    ],
+  },
+    {
     icon: <UserCircleIcon />,
-    name: "User Profile",
+    name: "Profil",
     path: "/profile",
   },
 ];
 
 const othersItems: NavItem[] = [
-  {
+   /*{
     icon: <PieChartIcon />,
-    name: "Charts",
+    name: "Statistiques",
     subItems: [
       { name: "Line Chart", path: "/line-chart", pro: false },
       { name: "Bar Chart", path: "/bar-chart", pro: false },
@@ -90,7 +102,7 @@ const othersItems: NavItem[] = [
       { name: "Sign In", path: "/signin", pro: false },
       { name: "Sign Up", path: "/signup", pro: false },
     ],
-  },
+  },*/
 ];
 
 const AppSidebar: React.FC = () => {
@@ -309,7 +321,7 @@ const AppSidebar: React.FC = () => {
             <>
               <img
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/logo-light.svg"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -324,7 +336,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <img
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/logo00.svg"
               alt="Logo"
               width={32}
               height={32}
@@ -350,22 +362,6 @@ const AppSidebar: React.FC = () => {
                 )}
               </h2>
               {renderMenuItems(navItems, "main")}
-            </div>
-            <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
             </div>
           </div>
         </nav>

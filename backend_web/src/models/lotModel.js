@@ -26,9 +26,26 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
 
+    prix_achat_unitaire: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0
+    },
+
+    cout_achat_initial: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0
+    },
+
     date_arrivee: {
       type: DataTypes.DATE,
       allowNull: false
+    },
+
+    date_sortie_prevue: {
+      type: DataTypes.DATE,
+      allowNull: true
     },
 
     deleted_at: {

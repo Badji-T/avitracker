@@ -26,23 +26,10 @@ const columns = [
     name: "Username",
     cell: (row: User) => (
       <div className="flex items-center gap-3 py-3">
-        {/*<div className="w-10 h-10 overflow-hidden rounded-full">
-          <img
-            width={40}
-            height={40}
-            alt={row.nom}
-            className="object-cover w-full h-full"
-          />
-        </div>*/}
-
         <div>
-          <span className="block font-medium text-gray-800 dark:text-white/90">
+          <span className="block font-medium text-gray-800 dark:text-white/50">
             {row.username}
           </span>
-
-          {/*<span className="block text-sm text-gray-500 dark:text-gray-400">
-            {row.nom} {row.prenom} - {row.role}
-          </span>*/}
         </div>
       </div>
     ),
@@ -52,13 +39,29 @@ const columns = [
 
   {
     name: "Nom",
-    selector: (row: User) => row.nom,
+    cell: (row: User) => (
+      <div className="flex items-center gap-3 py-3">
+        <div>
+          <span className="block font-medium text-gray-800 dark:text-white/50">
+            {row.nom}
+          </span>
+        </div>
+      </div>
+    ),
     sortable: true,
   },
 
   {
     name: "Prenom",
-    selector: (row: User) => row.prenom,
+    cell: (row: User) => (
+      <div className="flex items-center gap-3 py-3">
+        <div>
+          <span className="block font-medium text-gray-800 dark:text-white/50">
+            {row.prenom}
+          </span>
+        </div>
+      </div>
+    ),
     sortable: true,
   },
 
@@ -69,9 +72,9 @@ const columns = [
         size="sm"
         color={
           row.role === "admin"
-            ? "success"
-            : row.role === "user"
             ? "warning"
+            : row.role === "user"
+            ? "success"
             : "error"
         }
       >
@@ -83,22 +86,45 @@ const columns = [
 
   {
     name: "Telephone",
-    selector: (row: User) => row.tel,
+    cell: (row: User) => (
+      <div className="flex items-center gap-3 py-3">
+        <div>
+          <span className="block font-medium text-gray-800 dark:text-white/50">
+            {row.tel}
+          </span>
+        </div>
+      </div>
+    ),
     sortable: true,
     grow: 3,
   },
 
   {
     name: "Email(facultatif)",
-    selector: (row: User) => row.email ?? "N/A",
+    cell: (row: User) => (
+      <div className="flex items-center gap-3 py-3">
+        <div>
+          <span className="block font-medium text-gray-800 dark:text-white/50">
+            {row.email ?? "N/A"}
+          </span>
+        </div>
+      </div>
+    ),
     sortable: true,
     grow: 3,
   },
 
-
   {
-    name: "Date_creation_compte",
-    selector: (row: User) => row.created_at.split("T")[0],
+    name: "Date creation",
+    cell: (row: User) => (
+      <div className="flex items-center gap-3 py-3">
+        <div>
+          <span className="block font-medium text-gray-800 dark:text-white/50">
+            {row.created_at.split("T")[0]}
+          </span>
+        </div>
+      </div>
+    ),
     sortable: true,
     grow: 3,
   },
@@ -170,7 +196,7 @@ export default function BasicTableOne() {
             style: {
               backgroundColor: "transparent",
               borderBottomWidth: "1px",
-              borderBottomColor: "#E5E7EB",
+              borderBottomColor: "#6B7280",
               minHeight: "56px",
             },
           },
@@ -193,9 +219,11 @@ export default function BasicTableOne() {
 
           pagination: {
             style: {
+              backgroundColor: "transparent",
               borderTopWidth: "1px",
-              borderTopColor: "#E5E7EB",
+              borderTopColor: "#6B7280",
               minHeight: "56px",
+              color: "#676d79",
             },
           },
         }}

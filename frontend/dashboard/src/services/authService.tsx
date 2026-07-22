@@ -64,6 +64,21 @@ export const resetPassword = async (data: any) => {
   return response.data;
 };
 
+export const get_last_login = async () => {
+  const response = await api.get("/auth/recent-logins");
+  return response.data;
+}
+
+export const getRegistrationsByMonth = async () => {
+  const response = await api.get("/stats/registrations");
+  return response.data;
+};
+
+export const getUserStatistics = async () => {
+  const response = await api.get("/stats/statistics");
+  return response.data;
+};
+
 //DECONNEXION
 export const logout = () => {
     localStorage.removeItem("token");

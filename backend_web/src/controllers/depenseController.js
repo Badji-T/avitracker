@@ -1,4 +1,5 @@
-const {Depense} = require("../models");
+const { Depense } = require("../models");
+const depenseService = require("../services/depenseService");
 
 exports.getDepenses = async (req, res) => {
   try {
@@ -26,7 +27,7 @@ exports.createDepense = async (req, res) => {
         req.body.lot_id
     );
     await Depense.create({
-      code: code,
+      code_depense: code,
       lot_id: req.body.lot_id,
       type_depense: req.body.type_depense,
       montant: req.body.montant,

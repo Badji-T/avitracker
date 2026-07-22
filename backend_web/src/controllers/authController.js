@@ -80,31 +80,29 @@ exports.sendOTP = async (req, res) => {
   try {
     if (!validateChannel(channel)) {
       return res.status(400).json({
-        error: 'Canal invalide.',
+        error: "Canal invalide.",
       });
     }
 
-    const formattedPhone = validatePhone(tel);
-
-    if (channel === 'email') {
+    if (channel === "email") {
       if (!email) {
         return res.status(400).json({
-          error: 'Email requis.',
+          error: "Email requis.",
         });
       }
 
       await sendEmailOTP(email);
     } else {
+      const formattedPhone = validatePhone(tel);
       await sendSmsOTP(formattedPhone);
     }
 
-    return res.json({
+    return res.status(200).json({
       success: true,
-      message: 'Code envoyé.',
+      message: "Code envoyé.",
     });
-
   } catch (err) {
-    console.error('sendOTP error:', err);
+    console.error("sendOTP error:", err);
 
     return res.status(500).json({
       error: err.message || "Erreur lors de l'envoi du code.",
@@ -183,7 +181,9 @@ exports.startRegistration = async (req, res) => {
 
     // Envoi OTP
     if (channel === 'email') {
+      console.log("Envoi OTP à :", email);
       await sendEmailOTP(email);
+      console.log("OTP envoyé");
     } else {
       await sendSmsOTP(formattedPhone);
     }
@@ -356,6 +356,10 @@ exports.login = async (req, res) => {
       });
     }
 
+    await user.update({
+      last_login: new Date(),
+    });
+
     return res.json(
       authResponse(
         user,
@@ -370,4 +374,34 @@ exports.login = async (req, res) => {
       error: 'Erreur serveur.',
     });
   }
-}; 
+};
+
+exports.getRecentLogins = async (req, res) => {
+    try {
+      const users = await User.findAll({
+        attributes: [
+          "id",
+          "nom",
+          "prenom",
+          "tel",
+          "email",
+          "last_login"
+        ],
+
+        order: [
+          ["last_login", "DESC"]
+        ],
+
+        limit: 5
+
+      });
+
+      res.json(users);
+
+    } catch (error) {
+      console.error(error);
+        res.status(500).json({
+          message: "Erreur serveur"
+        });
+    }
+};

@@ -43,10 +43,6 @@ export default function EcommerceMetrics() {
               {users}
             </h4>
           </div>
-          <Badge color="success">
-            <ArrowUpIcon />
-            11.01%
-          </Badge>
         </div>
       </div>
       {/* <!-- Metric Item End --> */}

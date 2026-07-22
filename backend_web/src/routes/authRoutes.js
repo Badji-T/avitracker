@@ -56,4 +56,10 @@ router.post("/verify-reset-otp", verifyResetOTP);
 
 router.post("/reset-password", resetPassword);
 
+router.get(
+    "/recent-logins",
+    verifyToken,
+    authController.getRecentLogins
+);
+
 module.exports = router;
